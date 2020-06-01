@@ -16,19 +16,19 @@ class RouteModel : public Model {
         float h_value = std::numeric_limits<float>::max();
         float g_value = 0.0;
         bool visited = false;
-        std::vector<Node *> neighbors;
+        std::vector<Node *> neighbors; // Vector of pointers to nodes
 
         void FindNeighbors();
         float distance(Node other) const {
             return std::sqrt(std::pow((x - other.x), 2) + std::pow((y - other.y), 2));
         }
 
-        Node(){}
+        Node(){} b// What is this??? Why??
         Node(int idx, RouteModel * search_model, Model::Node node) : Model::Node(node), parent_model(search_model), index(idx) {}
 
       private:
         int index;
-        Node * FindNeighbor(std::vector<int> node_indices);
+        Node * FindNeighbor(std::vector<int> node_indices); // POINTER TO A FUNCTION???
         RouteModel * parent_model = nullptr;
     };
 

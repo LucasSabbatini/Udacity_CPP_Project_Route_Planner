@@ -9,24 +9,24 @@
 
 class RoutePlanner {
   public:
-    RoutePlanner(RouteModel &model, float start_x, float start_y, float end_x, float end_y);
+    RoutePlanner(RouteModel &model, float start_x, float start_y, float end_x, float end_y); // constructor
     // Add public variables or methods declarations here.
-    float GetDistance() const {return distance;}
-    void AStarSearch();
+    float GetDistance() const {return distance;} // method to retrieve the distance value -> will be used after the AStarSearch
+    void AStarSearch(); // main method to perform the AStar search - should update the distance attribute when completing the search
 
     // The following methods have been made public so we can test them individually.
-    void AddNeighbors(RouteModel::Node *current_node);
+    void AddNeighbors(RouteModel::Node *current_node); 
     float CalculateHValue(RouteModel::Node const *node);
     std::vector<RouteModel::Node> ConstructFinalPath(RouteModel::Node *);
     RouteModel::Node *NextNode();
 
   private:
     // Add private variables or methods declarations here.
-    std::vector<RouteModel::Node*> open_list;
-    RouteModel::Node *start_node;
-    RouteModel::Node *end_node;
+    std::vector<RouteModel::Node*> open_list; // vector of pointers to nodes
+    RouteModel::Node *start_node; // pointer to node
+    RouteModel::Node *end_node; // poinetr to node
 
-    float distance = 0.0f;
+    float distance = 0.0f; // will only be modified at the end
     RouteModel &m_Model;
 };
 

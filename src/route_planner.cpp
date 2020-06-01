@@ -10,7 +10,11 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 
     // TODO 2: Use the m_Model.FindClosestNode method to find the closest nodes to the starting and ending coordinates.
     // Store the nodes you find in the RoutePlanner's start_node and end_node attributes.
+    
 
+    // We start with the coordinates chosen by the user, and calculate the closes nodes to the start and the end locations
+    start_node = &m_Model.FindClosestNode(start_x, start_y); // Should I return the address? Yes, because start_node and end_node are pointers
+    end_node = &m_Model.FindClosestNode(end_x, end_y);
 }
 
 
@@ -20,7 +24,7 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 // - Node objects have a distance method to determine the distance to another node.
 
 float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
-
+    return node->distance(*end_node); // distance recieves a node object (by value), so we need to dereference it
 }
 
 
@@ -32,7 +36,15 @@ float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
 // - For each node in current_node.neighbors, add the neighbor to open_list and set the node's visited attribute to true.
 
 void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
-
+  //find neighbors for current node using FindNeighbors
+    current_node->FindNeighbors(); // populate current_node.neighbors. This will also check if node has been visited
+    for (auto node : current_node->neighbors) {
+        node->parent = current_node; // node.parent is a pointer, and so is current_node
+        (*node).h_value = this->CalculateHValue(node);
+        (*node).g_value = current_node->g_value + current_node->distance(*node); // 
+        this->open_list.emplace_back(node);
+        (*node).visited = true;
+    }
 }
 
 
@@ -42,6 +54,29 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 // - Create a pointer to the node in the list with the lowest sum.
 // - Remove that node from the open_list.
 // - Return the pointer.
+
+// TODO: Sum the g and h values for both Nodes and return true is f1 > f2 and false else
+bool Compare(const vector<int> &n1, const vector<int> &n2) {
+  int f1 = n1[2] + n1[3];
+  int f2 = n2[2] + n2[3];
+  if (f1 > f2) {
+      return true;
+  } else {
+      return false;
+  }
+} 
+bool Compare(const RouteModel::Node *n1, const RouteModel::Node *n2) {
+    int v1 = n1->h_value + n1->g_value;
+    int v2 = n2->h_value + n2->g_value;
+    return v1 > v2;
+}
+
+/**
+ * Sort the two-dimensional vector of ints in descending order.
+ */
+void CellSort(vector<RouteModel::Node*> *open) {
+  sort(v->begin(), v->end(), Compare);
+}
 
 RouteModel::Node *RoutePlanner::NextNode() {
 

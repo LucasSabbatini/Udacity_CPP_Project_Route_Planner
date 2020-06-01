@@ -54,31 +54,25 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 // - Create a pointer to the node in the list with the lowest sum.
 // - Remove that node from the open_list.
 // - Return the pointer.
-
+#include <algorithm>
+using std::sort;
 // TODO: Sum the g and h values for both Nodes and return true is f1 > f2 and false else
-bool Compare(const vector<int> &n1, const vector<int> &n2) {
-  int f1 = n1[2] + n1[3];
-  int f2 = n2[2] + n2[3];
-  if (f1 > f2) {
-      return true;
-  } else {
-      return false;
-  }
-} 
 bool Compare(const RouteModel::Node *n1, const RouteModel::Node *n2) {
     int v1 = n1->h_value + n1->g_value;
     int v2 = n2->h_value + n2->g_value;
     return v1 > v2;
 }
-
 /**
  * Sort the two-dimensional vector of ints in descending order.
  */
-void CellSort(vector<RouteModel::Node*> *open) {
+void NodeSort(vector<RouteModel::Node> *open) {
   sort(v->begin(), v->end(), Compare);
 }
 
-RouteModel::Node *RoutePlanner::NextNode() {
+RouteModel::Node *RoutePlanner::NextNode() { // Why is it referencing now and not in the other methods??
+    NodeSort(this->open_list); // Sorting the open list
+    auto *next_node = open_list.back();
+    open_list.pop_back();
 
 }
 

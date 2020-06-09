@@ -17,6 +17,7 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
     end_node = &m_Model.FindClosestNode(end_x, end_y);
   	start_node->g_value = 0;
   	start_node->h_value = CalculateHValue(start_node);
+  	end_node->h_value = 0;
   	m_Model = model;
 }
 
@@ -59,42 +60,37 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 #include <algorithm>
 using std::sort;
 bool Compare(const RouteModel::Node *n1, const RouteModel::Node *n2) {
-  // Compare the two nodes using the sum of their h ang g values
-  int v1 = n1->h_value + n1->g_value;
-  int v2 = n2->h_value + n2->g_value;
-  return v1 > v2;
+  return (n1->h_value + n1->g_value) > (n2->h_value + n2->g_value);
 }
-/**
- * Sort the two-dimensional vector of ints in descending order.
- */
+
 void NodeSort(std::vector<RouteModel::Node*> &open) {
   sort(open.begin(), open.end(), Compare);
 }
 
 void PrintOpenList(vector<RouteModel::Node*> open_list) {
-  if (open_list.size() > 30) {
-    for (int i=0; i<20; i++) {
-      auto node = open_list[i];
-      double value = node->h_value + node->g_value;
-      cout << "value for node: " << value << "\n";
+  int counter = 0;
+  for (auto node : open_list) {
+    double value = node->h_value + node->g_value;
+    cout << "value for node: " << value << "\n";
+    if (counter >= 20) {
+      break;
     }
+    counter++;
   }
+}
+
+void PrintNode(RouteModel::Node *node) {
+  float value = node->h_value + node->g_value;
+  cout << "Node: x: " << node->x << ", y: " << node->y << ", h:" << node->h_value << ", g: " << node->g_value << ", total value: " << value << "\n";
 }
   
 RouteModel::Node *RoutePlanner::NextNode() { // This means it will return a pointer to a node
   // Sorting the open list using auxiliar functions
-  cout << "------------\n" << "Before NodeSort" << "\n";
-//   if (open_list.size() > 30)//   	for (int i=0; i<20; i {
-//       auto node = open_t[i];
-//       double value = node->h_value + nodg_value;
-//       cout << "value for node: " << ue "\n";
-//     }
-//   }
-//   cout << "Size of open list: " << open_list.size() << "\n";
-  PrintOpenList(open_list);
+//   cout << "------------\n" << "Before NodeSort" << "\n";
+//   PrintOpenList(open_list);
   NodeSort(open_list);
-  cout << "After NodeSort" << "\n";
-  PrintOpenList(open_list);
+//   cout << "After NodeSort" << "\n";
+//   PrintOpenList(open_list);
   //Pointing to the first node from the list: the next node to open
   RouteModel::Node *next_node = this->open_list.back();
   this->open_list.pop_back();
@@ -121,6 +117,7 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
       current_node = current_node->parent;
       path_found.push_back(*current_node);
     }
+//   	path_found.push_back(*current_node);
 	// TODO reverse path_found list
   	std::reverse(path_found.begin(), path_found.end());
   
@@ -143,19 +140,25 @@ void RoutePlanner::AStarSearch() {
   // TODO: Implement your solution here.
   start_node->visited = true;
   current_node = start_node;
+  PrintNode(current_node);
+  PrintNode(end_node);
   open_list.push_back(current_node);
   AddNeighbors(current_node);
-
+//   if (true) {
+//   	return;
+//   }
   while (!open_list.empty()) {
     current_node = NextNode();
     if (current_node == end_node) {
       std::vector<RouteModel::Node> final_path = ConstructFinalPath(current_node);
       this->m_Model.path = final_path;
-      std::cout << "The final path has " << final_path.size() << " nodes" << "\n" ;
+      cout << "The final path has " << final_path.size() << " nodes" << "\n" ;
+      cout << "First and last nodes: " << "\n";
+      PrintNode(&final_path[0]);
+      PrintNode(&final_path.back());
       return;
+      
     }
     AddNeighbors(current_node);
   }
-
-
 }

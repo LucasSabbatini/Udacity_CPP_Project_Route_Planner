@@ -67,7 +67,7 @@ void NodeSort(std::vector<RouteModel::Node*> &open) {
   sort(open.begin(), open.end(), Compare);
 }
 
-void PrintOpenList(vector<RouteModel::Node*> open_list) {
+void PrintOpenList(vector<RouteModel::Node*> &open_list) {
   int counter = 0;
   for (auto node : open_list) {
     double value = node->h_value + node->g_value;
@@ -78,10 +78,21 @@ void PrintOpenList(vector<RouteModel::Node*> open_list) {
     counter++;
   }
 }
-
-void PrintNode(RouteModel::Node *node) {
+#include <string>
+void PrintNode(RouteModel::Node *node, std::string message="Node: ") {
   float value = node->h_value + node->g_value;
-  cout << "Node: x: " << node->x << ", y: " << node->y << ", h:" << node->h_value << ", g: " << node->g_value << ", total value: " << value << "\n";
+  cout << message <<" x: " << node->x << ", y: " << node->y << ", h:" << node->h_value << ", g: " << node->g_value << ", total value: " << value << "\n";
+}
+
+void PrintFinalPath(vector<RouteModel::Node> &final_path) {
+  cout << "Printing Final Path: " << "\n";
+//   for (auto node: final_path) {
+//     PrintNode(&node);
+//   }
+  for (int i=0; i<=final_path.size(); i++) {
+    std::string message = "Node " + std::to_string(i) + ": ";
+    PrintNode(&final_path[i], message);
+  }
 }
   
 RouteModel::Node *RoutePlanner::NextNode() { // This means it will return a pointer to a node
@@ -96,7 +107,6 @@ RouteModel::Node *RoutePlanner::NextNode() { // This means it will return a poin
   this->open_list.pop_back();
   return next_node;
 }
-
 
 // TODO 6: Complete the ConstructFinalPath method to return the final path found from your A* search.
 // Tips:
@@ -140,8 +150,8 @@ void RoutePlanner::AStarSearch() {
   // TODO: Implement your solution here.
   start_node->visited = true;
   current_node = start_node;
-  PrintNode(current_node);
-  PrintNode(end_node);
+  PrintNode(start_node, "Start node: ");
+  PrintNode(end_node, "End node: ");
   open_list.push_back(current_node);
   AddNeighbors(current_node);
 //   if (true) {
@@ -154,8 +164,9 @@ void RoutePlanner::AStarSearch() {
       this->m_Model.path = final_path;
       cout << "The final path has " << final_path.size() << " nodes" << "\n" ;
       cout << "First and last nodes: " << "\n";
-      PrintNode(&final_path[0]);
-      PrintNode(&final_path.back());
+      PrintNode(&final_path[0], "first node: ");
+      PrintNode(&final_path.back(), "last node: ");
+      PrintFinalPath(final_path);
       return;
       
     }
